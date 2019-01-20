@@ -1,1 +1,1 @@
-The Eyam Sports Association site
+Just a ScalaJS place for playing around w/ geometry algos, which exist in better forms elsewhere
