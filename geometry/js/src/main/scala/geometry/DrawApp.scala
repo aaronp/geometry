@@ -1,4 +1,4 @@
-package pipelines.client
+package geometry
 
 import org.scalajs.dom
 import org.scalajs.dom.raw.{ClientRect, MouseEvent}

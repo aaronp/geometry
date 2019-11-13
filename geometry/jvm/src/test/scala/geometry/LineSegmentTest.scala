@@ -49,6 +49,31 @@ class LineSegmentTest extends WordSpec with Matchers {
       LineSegment(30, -10, 10, -8).reverse.midpoint shouldBe Point(20, -9)
     }
   }
+  "LineSegment.scaledPoint" should {
+    "return the point at the point along the line" in {
+      LineSegment(-2, -2, 2, 2).scaledPoint(0) shouldBe Point(-2, -2)
+      LineSegment(-2, -2, 2, 2).scaledPoint(1) shouldBe Point(2, 2)
+      LineSegment(-2, -2, 2, 2).scaledPoint(2) shouldBe Point(6, 6)
+      LineSegment(-2, -2, 2, 2).scaledPoint(0.5) shouldBe Point(0, 0)
+      LineSegment(0, 0, 0, 100).scaledPoint(0.7) shouldBe Point(0, 70)
+      LineSegment(0, 0, 100, 0).scaledPoint(0.7) shouldBe Point(70, 0)
+      LineSegment(100, 0, 0, 0).scaledPoint(0.7) shouldBe Point(30, 0)
+    }
+  }
+  "LineSegment.length" should {
+    "return the line length" in {
+      List(
+        LineSegment(0, 0, 10, 0),
+        LineSegment(0, 0, 0, 10),
+        LineSegment(0, 10, 0, 0),
+        LineSegment(10, 0, 0, 0),
+        LineSegment(-5, 0, 5, 0),
+        LineSegment(-5, 5, 5, 5),
+        LineSegment(0, -5, 0, 5),
+        LineSegment(0, 5, 0, -5)
+      ).foreach(_.length shouldBe 10)
+    }
+  }
   "LineSegment.slope" should {
 
     "return 1/2 for LineSegment(Point(0, 1), Point(2, 2)).slope" in {

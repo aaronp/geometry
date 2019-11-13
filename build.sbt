@@ -7,7 +7,7 @@ val repo = "geometry"
 name := repo
 
 val username            = "aaronp"
-val scalaTwelve         = "2.12.9"
+val scalaTwelve         = "2.12.10"
 val scalaThirteen       = "2.13.0"
 val defaultScalaVersion = scalaTwelve
 val scalaVersions       = Seq(scalaTwelve) //, scalaThirteen)
@@ -29,7 +29,7 @@ scalafmtOnCompile in ThisBuild := true
 scalafmtVersion in ThisBuild := "1.4.0"
 
 // Define a `Configuration` for each project, as per http://www.scala-sbt.org/sbt-site/api-documentation.html
-val Geometry        = config("geometryJVM")
+val Geometry = config("geometryJVM")
 
 git.remoteRepo := s"git@github.com:$username/$repo.git"
 ghpagesNoJekyll := true
@@ -59,12 +59,8 @@ val testDependencies = List(
   "org.pegdown"            % "pegdown"    % "1.6.0" % "test"
 )
 
-val simulacrum: ModuleID = "com.github.mpilquist" %% "simulacrum" % "0.13.0"
-
 lazy val scaladocSiteProjects = List(
-  (expressions, Expressions),
-  (geometryJVM, Geometry),
-  (ExpressionsAst, ExpressionsAst)
+  (geometryJVM, Geometry)
 )
 
 lazy val scaladocSiteSettings = scaladocSiteProjects.flatMap {
@@ -199,6 +195,7 @@ lazy val geometry = crossProject(JSPlatform, JVMPlatform)
     siteSubdirName in SiteScaladoc := "api/latest"
   )
   .jsSettings(name := "geometry-js")
+  .jsSettings(libraryDependencies ++= List("com.lihaoyi" %%% "scalatags" % "0.7.0", "org.scala-js" %%% "scalajs-dom" % "0.9.7"))
 
 lazy val geometryJVM = geometry.jvm
 lazy val geometryJS  = geometry.js

@@ -26,7 +26,7 @@ class PlotTest extends WordSpec with Matchers {
         (4, AsciiRow(List((-5, 'o')))),
         (5, AsciiRow(List((-5, 'o'))))
       )
-      val text = rows.toString.lines.toList
+      val text = rows.toString.linesIterator.toList
 
       text.size shouldBe 11
       text.foreach(_ should startWith("o"))
@@ -49,7 +49,7 @@ class PlotTest extends WordSpec with Matchers {
         (4, AsciiRow(List((5, 'o')))),
         (5, AsciiRow(List((5, 'o'))))
       )
-      val text = rows.toString.lines.toList
+      val text = rows.toString.linesIterator.toList
 
       text.size shouldBe 11
       text.foreach(_ should startWith("o"))
@@ -72,7 +72,7 @@ class PlotTest extends WordSpec with Matchers {
         (4, AsciiRow(List((5, 'o')))),
         (5, AsciiRow(List((5, 'o'))))
       )
-      val text = rows.toString.lines.toList
+      val text = rows.toString.linesIterator.toList
 
       text.size shouldBe 11
       text.foreach(_ should startWith("o"))

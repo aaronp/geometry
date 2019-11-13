@@ -15,9 +15,30 @@ case class LineSegment(from: Point, to: Point) {
   def x2 = to.x
   def y2 = to.y
 
-  def width    = to.x - from.x
-  def height   = to.y - from.y
+  def width  = to.x - from.x
+  def height = to.y - from.y
+
   def midpoint = Point(from.x + (width / 2), from.y + (height / 2))
+
+  def scaledPoint(percent: Double): Point = {
+    if (slope.isVertical || slope.value.abs >= 1.0) {
+      // choose a point on the y axis
+      val yPoint = y1 + ((y2 - y1) * percent)
+      Point(xValueAt(yPoint), yPoint)
+    } else {
+      // choose a point on the x axis
+      val xPoint = x1 + ((x2 - x1) * percent)
+      Point(xPoint, yValueAt(xPoint))
+    }
+  }
+
+  def length: Double = {
+    val xDelta = x2 - x1
+    val yDelta = y2 - y1
+    val xSqrd  = xDelta * xDelta
+    val ySqrd  = yDelta * yDelta
+    Math.sqrt(xSqrd + ySqrd)
+  }
 
   /** @param y the y coordinate
     * @return
@@ -29,6 +50,16 @@ case class LineSegment(from: Point, to: Point) {
       m
     } else {
       (y - b) / m
+    }
+  }
+
+  def yValueAt(x: Double) = {
+    if (slope.isHorizontal) {
+      y1
+    } else if (m.isNaN) {
+      m
+    } else {
+      (x * m) + b
     }
   }
 
@@ -78,16 +109,6 @@ case class LineSegment(from: Point, to: Point) {
         .orElse(bounds.leftEdge.intersectPoint(edge).map(clipLeft))
 
       opt.getOrElse(Nil)
-    }
-  }
-
-  def yValueAt(x: Double) = {
-    if (slope.isHorizontal) {
-      y1
-    } else if (m.isNaN) {
-      m
-    } else {
-      (x * m) + b
     }
   }
 
