@@ -10,13 +10,14 @@ object TestMessages {
     EventData("e", "alpha", "bar", 500, "fifth")
   )
 
-  val testMessages = events.zipWithIndex.flatMap {
+  val testMessages = events.zipWithIndex.map {
     case (event, i) =>
       val latency = i % 3 match {
         case 0 => 50
         case 1 => 220
         case _ => 150
       }
-      List(SendEvent(event), ReceiveEvent(event.swapAfter(latency)))
+      val to = event.swapAfter(latency)
+      MessageExchanged(i.toString, Coord(event.from, event.timestamp), Coord(to.from, to.timestamp))
   }
 }
