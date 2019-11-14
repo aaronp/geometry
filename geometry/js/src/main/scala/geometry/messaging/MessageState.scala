@@ -1,7 +1,5 @@
 package geometry.messaging
 
-import geometry.messaging.Messages.RenderContext
-
 case class MessageState(allEvents: Seq[MessageExchanged], currentTime: Long) {
   val (events, outOfRangeEvents) = allEvents.partition(_.contains(currentTime))
 

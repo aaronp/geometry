@@ -1,7 +1,6 @@
 package geometry.messaging
 
 import geometry._
-import geometry.messaging.Messages.RenderContext
 
 class InFlightRenderedGraph(ctxt: RenderContext, state: MessageState, currentTime: Long) {
 
