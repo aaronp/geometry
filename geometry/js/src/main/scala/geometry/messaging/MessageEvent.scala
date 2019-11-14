@@ -12,9 +12,3 @@ final case class EventData[A](id: String, from: String, to: String, timestamp: L
   def swap(ts: Long = timestamp): EventData[A] = copy(from = to, to = from, timestamp = ts)
   def swapAfter(latency: Long): EventData[A]   = copy(from = to, to = from, timestamp = timestamp + latency)
 }
-
-//object EventData {
-//  def apply(from: String, to: String, timestamp: Long, id: String = UUID.randomUUID.toString): EventData[A] = {
-//    new EventData(id, from, to, timestamp, Json.Null)
-//  }
-//}

@@ -1,9 +1,9 @@
 package geometry.messaging
 
-import geometry.{HtmlUtils, Interpolate, LineSegment, Point}
+import geometry.{HtmlUtils, Point}
 import org.scalajs.dom
 import org.scalajs.dom.CanvasRenderingContext2D
-import org.scalajs.dom.html.{Canvas, Div}
+import org.scalajs.dom.html.Canvas
 import scalatags.JsDom.all._
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -22,18 +22,30 @@ object Messages {
     def center: Point = Point(width / 2, height / 2)
   }
 
-  case class Controls(initialContext: RenderContext) {
-    val timeSlider = input(`type` := "range", min := 1, max := 1000, value := 500).render
+  case class Controls(initialContext: RenderContext, messages: Seq[MessageExchanged]) {
+    //minTimeStamp
 
-    def draw = {
+    private var state       = MessageState(messages, 1)
+    private var latestGraph = state.render(initialContext)
+    private val minTime     = state.minTimeStamp.toInt
+    private val maxTime     = state.maxTimeStamp.toInt
+
+    private val timeSlider = input(`type` := "range", min := minTime, max := maxTime, value := minTime, style := "width:100%").render
+
+    private def draw = {
       val pos = timeSlider.valueAsNumber
-      MessageState(TestMessages.testMessages, pos.toLong).render(initialContext)
+      state = MessageState(messages, pos.toLong)
+      latestGraph = state.render(initialContext)
     }
     timeSlider.onchange = _ => draw
     timeSlider.oninput = _ => draw
 
+    initialContext.canvas.canvas.onmousemove = (event) => {
+
+      latestGraph.onMouseMove(Point(event.pageX, event.pageY))
+    }
+
     def render = {
-      MessageState(TestMessages.testMessages, 1).render(initialContext)
       div(timeSlider).render
     }
   }
@@ -41,10 +53,8 @@ object Messages {
   @JSExport
   def render(controlsDivId: String, containerId: String) = {
     HtmlUtils.log(s"Rendering $controlsDivId and $containerId")
-    //<input type="range" min="1" max="100" value="50">
-    val controlsContainer: Div = HtmlUtils.divById(controlsDivId)
 
-    val canvas = HtmlUtils.elmById(containerId) match {
+    val canvas: Canvas = HtmlUtils.elmById(containerId) match {
       case c: Canvas => c
     }
 
@@ -56,8 +66,13 @@ object Messages {
     canvas.width = dom.window.outerWidth
     canvas.height = dom.window.outerHeight
 
-    val c = Controls(RenderContext(dd, Style((canvas.width) / 4, 10, 3), canvas.width, canvas.height))
+    val controlsContainer = HtmlUtils.divById(controlsDivId)
     controlsContainer.innerHTML = ""
+
+    val ctxt = RenderContext(dd, Style(200, 10, 3), canvas.width, canvas.height)
+    val msgs = TestMessages.testMessages
+    val c    = Controls(ctxt, msgs)
+
     controlsContainer.appendChild(c.render)
   }
 

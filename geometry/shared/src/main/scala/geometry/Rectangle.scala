@@ -14,6 +14,9 @@ final case class Rectangle private (topLeft: Point, bottomRight: Point) {
   def containsY(yValue: Double) = {
     yValue <= topLeft.y && yValue >= bottomRight.y
   }
+  def swapY = {
+    copy(topLeft = topLeft.copy(y = bottomRight.y), bottomRight = bottomRight.copy(y = topLeft.y))
+  }
 
   /** @param other the other rectangle from which to build a new rectangle from which
     * @return a rectangle which contains both this and the other rectangle
