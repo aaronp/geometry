@@ -3,11 +3,12 @@ package geometry
 import java.util.UUID
 
 import org.scalajs.dom
-import org.scalajs.dom.html.Div
+import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.dom.raw._
-import org.scalajs.dom.{document, html, window}
+import org.scalajs.dom.{CanvasRenderingContext2D, document, html, window}
 
 import scala.collection.immutable
+import scala.scalajs.js
 import scala.util.control.NonFatal
 
 object HtmlUtils extends HtmlUtils
@@ -28,6 +29,16 @@ trait HtmlUtils {
     case div: Div => div
   }
   def elmById(id: String) = document.getElementById(id)
+  def canvas(canvasId: String) = {
+    elmById(canvasId) match {
+      case c: Canvas => c
+    }
+  }
+  def canvas2D(canvasId: String): CanvasRenderingContext2D = {
+    canvas(canvasId).getContext("2d") match {
+      case value: CanvasRenderingContext2D => value
+    }
+  }
 
   def $(id: String) = elmById(id)
 

@@ -25,6 +25,6 @@ object TestMessages {
         case _ => 150
       }
       val to = event.swapAfter(latency)
-      MessageExchanged(i.toString, Coord(event.from, event.timestamp), Coord(to.from, to.timestamp))
+      MessageExchanged(i.toString, MessageExchanged.Coord(event.from, event.timestamp), MessageExchanged.Coord(to.from, to.timestamp))
   }
 }

@@ -2,6 +2,13 @@ package geometry.messaging
 
 import geometry._
 
+/**
+  * A representation of the in-flight messages as draw so that we can check mouse-overs for the various nodes/messages
+  *
+  * @param ctxt
+  * @param state
+  * @param currentTime
+  */
 class InFlightRenderedGraph(ctxt: RenderContext, state: MessageState, currentTime: Long) {
 
   val centerByNodeId: Map[String, Point]     = renderNodes(ctxt)

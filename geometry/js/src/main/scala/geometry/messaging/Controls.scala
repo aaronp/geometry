@@ -1,6 +1,7 @@
 package geometry.messaging
 
 import geometry.Point
+import monix.reactive.Observable
 import scalatags.JsDom.all._
 
 /**
@@ -18,6 +19,8 @@ case class Controls(initialContext: RenderContext, messages: Seq[MessageExchange
   private val timeSlider  = input(`type` := "range", min := minTime, max := maxTime, value := minTime, style := "width:100%").render
   private val speedSlider = input(`type` := "range", min := minTime, max := maxTime, value := minTime, style := "width:100%").render
 
+  Observable.ev
+
   private def draw = {
     val pos = timeSlider.valueAsNumber
     state = MessageState(messages, pos.toLong)
@@ -27,7 +30,6 @@ case class Controls(initialContext: RenderContext, messages: Seq[MessageExchange
   timeSlider.oninput = _ => draw
 
   initialContext.canvas.canvas.onmousemove = (event) => {
-
     latestGraph.onMouseMove(Point(event.pageX, event.pageY))
   }
 

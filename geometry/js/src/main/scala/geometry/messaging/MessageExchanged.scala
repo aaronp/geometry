@@ -1,6 +1,6 @@
 package geometry.messaging
 
-final case class MessageExchanged(id: String, from: Coord, to: Coord) {
+final case class MessageExchanged(id: String, from: MessageExchanged.Coord, to: MessageExchanged.Coord) {
   def contains(time: Long) = time >= from.timestamp && time <= to.timestamp
   def maxTimestamp         = from.timestamp.max(to.timestamp)
   def minTimestamp         = from.timestamp.min(to.timestamp)
@@ -14,4 +14,8 @@ final case class MessageExchanged(id: String, from: Coord, to: Coord) {
     }
   }
   def took: Long = to.timestamp - from.timestamp
+}
+
+object MessageExchanged {
+  final case class Coord(name: String, timestamp: Long)
 }

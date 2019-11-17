@@ -1,9 +1,10 @@
 package geometry.messaging
 
 import geometry.HtmlUtils
+import monix.execution.Scheduler.Implicits.global
+import monix.reactive.Observable
 import org.scalajs.dom
-import org.scalajs.dom.CanvasRenderingContext2D
-import org.scalajs.dom.html.Canvas
+import org.scalajs.dom.html.Div
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
@@ -13,26 +14,29 @@ object Messages {
   @JSExport
   def render(controlsDivId: String, containerId: String) = {
     HtmlUtils.log(s"Rendering $controlsDivId and $containerId")
-
-    val canvas: Canvas = HtmlUtils.elmById(containerId) match {
-      case c: Canvas => c
-    }
+    val canvas = HtmlUtils.canvas(containerId)
+    canvas.width = dom.window.outerWidth
+    canvas.height = (dom.window.outerHeight * 0.7).toInt
 
     // 2D. Get it?
-    val dd: CanvasRenderingContext2D = canvas.getContext("2d") match {
-      case value: CanvasRenderingContext2D => value
+    val dd = HtmlUtils.canvas2D(containerId)
+
+    val ctxt: RenderContext = RenderContext(dd, Style(200, 10, 3), canvas.width, canvas.height)
+
+    val messages = Observable.fromIterable(TestMessages.testMessages)
+
+    val controlsContainer: Div = HtmlUtils.divById(controlsDivId)
+    renderMessages(controlsContainer, ctxt, messages)
+  }
+
+  def renderMessages(controlsContainer: Div, ctxt: RenderContext, messages: Observable[MessageExchanged]) = {
+
+    // TODO - fix this
+    messages.toListL.runToFuture.foreach { batch =>
+      val control = Controls(ctxt, batch)
+      controlsContainer.innerHTML = ""
+      controlsContainer.appendChild(control.render)
     }
 
-    canvas.width = dom.window.outerWidth
-    canvas.height = dom.window.outerHeight
-
-    val controlsContainer = HtmlUtils.divById(controlsDivId)
-    controlsContainer.innerHTML = ""
-
-    val ctxt = RenderContext(dd, Style(200, 10, 3), canvas.width, canvas.height)
-    val msgs = TestMessages.testMessages
-    val c    = Controls(ctxt, msgs)
-
-    controlsContainer.appendChild(c.render)
   }
 }
