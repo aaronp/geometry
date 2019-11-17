@@ -13,6 +13,8 @@ object Messages {
 
   @JSExport
   def render(controlsDivId: String, containerId: String) = {
+    val api: MessageApi = MessageApi.test()
+
     HtmlUtils.log(s"Rendering $controlsDivId and $containerId")
     val canvas = HtmlUtils.canvas(containerId)
     canvas.width = dom.window.outerWidth
@@ -23,20 +25,19 @@ object Messages {
 
     val ctxt: RenderContext = RenderContext(dd, Style(200, 10, 3), canvas.width, canvas.height)
 
-    val messages = Observable.fromIterable(TestMessages.testMessages)
 
     val controlsContainer: Div = HtmlUtils.divById(controlsDivId)
     renderMessages(controlsContainer, ctxt, messages)
   }
 
-  def renderMessages(controlsContainer: Div, ctxt: RenderContext, messages: Observable[Message]) = {
+  def renderMessages(controlsContainer: Div, ctxt: RenderContext, api: MessageApi) = {
 
-    // TODO - fix this
-    messages.toListL.runToFuture.foreach { batch =>
-      val control = Controls(ctxt, batch)
+    api.minEventTime.foreach { minTime =>
+      val control = Controls(ctxt, api, minTime)
       controlsContainer.innerHTML = ""
       controlsContainer.appendChild(control.render)
     }
+
 
   }
 }

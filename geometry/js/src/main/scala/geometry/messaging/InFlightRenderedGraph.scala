@@ -1,6 +1,7 @@
 package geometry.messaging
 
 import geometry._
+import geometry.messaging.InFlightRenderedGraph._
 
 /**
   * A representation of the in-flight messages as draw so that we can check mouse-overs for the various nodes/messages
@@ -22,33 +23,36 @@ class InFlightRenderedGraph(ctxt: RenderContext, state: MessageState, currentTim
   }
 
   private object debounce {
-    var selectedNode = Option.empty[String]
-    var selectedMsg  = Option.empty[String]
+    private var previousSelection = Option.empty[GraphSelection]
+    def clear() = {
+      val before = previousSelection
+      previousSelection = None
+      MouseOver(NoSelection, before)
+    }
+    def nextSelection(currentSelection: GraphSelection) = {
+      val before = previousSelection
+      previousSelection = Option(currentSelection)
+      MouseOver(currentSelection, before)
+    }
   }
 
-  def onMouseMove(mousePoint: Point) = {
+  def onMouseMove(mousePoint: Point): MouseOver = {
     val mouseOverId = centerByNodeId.collectFirst {
       case (name, center: Point) if nodeContains(center, mousePoint) => name
     }
 
     mouseOverId match {
       case Some(nodeId) =>
-        if (!debounce.selectedNode.exists(_ == nodeId)) {
-          HtmlUtils.log(s"mouseOver $nodeId contains $mousePoint, ${inFlightMessages.size} in flight of ${state.allEvents.size} events")
-        }
-        debounce.selectedMsg = None
+        debounce.nextSelection(NodeSelection(nodeId))
       case None =>
-        val msgOpt = inFlightMessages.find { msg =>
+        val msgOpt: Option[InFlightMessage] = inFlightMessages.find { msg =>
           nodeContains(msg.currentPosition, mousePoint)
         }
-        msgOpt.foreach { inFlight =>
-          if (!debounce.selectedMsg.exists(_ == inFlight.message.id)) {
-            HtmlUtils.log(s"mouseOver in-flight message $inFlight")
-          }
-          debounce.selectedMsg = Option(inFlight.message.id)
+        msgOpt match {
+          case None           => debounce.clear()
+          case Some(inFlight) => debounce.nextSelection(MessageSelection(inFlight.message.id))
         }
     }
-    debounce.selectedNode = mouseOverId
   }
 
   private def renderMessages(ctxt: RenderContext, positions: Seq[InFlightMessage]): Unit = {
@@ -110,4 +114,12 @@ class InFlightRenderedGraph(ctxt: RenderContext, state: MessageState, currentTim
     centerByNodeId
   }
 
+}
+
+object InFlightRenderedGraph {
+  final case class MouseOver(selection: GraphSelection, previousSelection: Option[GraphSelection])
+  sealed trait GraphSelection
+  case object NoSelection                        extends GraphSelection
+  case class NodeSelection(nodeId: String)       extends GraphSelection
+  case class MessageSelection(messageId: String) extends GraphSelection
 }

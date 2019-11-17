@@ -1,36 +1,37 @@
 package geometry.messaging
 
 import geometry.Point
-import monix.reactive.Observable
 import scalatags.JsDom.all._
 
 /**
   * A handle on the messaging controls
-  * @param initialContext
-  * @param messages
   */
-case class Controls(initialContext: RenderContext, messages: Seq[Message]) {
+class Controls(initialContext: RenderContext, api: MessageApi, startTime: Long, minTime: Int) {
 
-  private var state       = MessageState(messages, 1)
-  private var latestGraph = state.render(initialContext)
-  private val minTime     = state.minTimeStamp.toInt
-  private val maxTime     = state.maxTimeStamp.toInt
+  //api: MessageApi
 
-  private val timeSlider  = input(`type` := "range", min := minTime, max := maxTime, value := minTime, style := "width:100%").render
-  private val speedSlider = input(`type` := "range", min := minTime, max := maxTime, value := minTime, style := "width:100%").render
-
-  Observable.ev
+//  def state: MessageState
+//  private var latestGraph = state.render(initialContext)
+//  private val maxTime     = state.maxTimeStamp.toInt
+//
+  private val initialMaxTime = (System.currentTimeMillis() - startTime).toInt
+  private val timeSlider     = input(`type` := "range", min := minTime, max := initialMaxTime, value := minTime, style := "width:100%").render
+  private val speedSlider    = input(`type` := "range", min := 0, max := 500, value := 100, style := "width:100%").render
 
   private def draw = {
     val pos = timeSlider.valueAsNumber
-    state = MessageState(messages, pos.toLong)
-    latestGraph = state.render(initialContext)
+//    state = MessageState(messages, pos.toLong)
+    //latestGraph = state.render(initialContext)
   }
+
+  var latestGraph = Option.empty[InFlightRenderedGraph]
   timeSlider.onchange = _ => draw
   timeSlider.oninput = _ => draw
 
   initialContext.canvas.canvas.onmousemove = (event) => {
-    latestGraph.onMouseMove(Point(event.pageX, event.pageY))
+    latestGraph.foreach { current =>
+      current.onMouseMove(Point(event.pageX, event.pageY))
+    }
   }
 
   def render = {
