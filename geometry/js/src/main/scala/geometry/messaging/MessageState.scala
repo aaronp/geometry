@@ -1,6 +1,6 @@
 package geometry.messaging
 
-case class MessageState(allEvents: Seq[MessageExchanged], currentTime: Long) {
+case class MessageState(allEvents: Seq[Message], currentTime: Long) {
   val (events, outOfRangeEvents) = allEvents.partition(_.contains(currentTime))
 
   def maxTimeStamp = if (allEvents.isEmpty) 0L else allEvents.map(_.maxTimestamp).max

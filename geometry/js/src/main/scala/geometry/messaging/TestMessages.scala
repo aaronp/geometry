@@ -17,7 +17,7 @@ object TestMessages {
     EventData("l", "foo", "fizz", 815, "data")
   )
 
-  val testMessages: List[MessageExchanged] = events.zipWithIndex.map {
+  val testMessages: List[Message] = events.zipWithIndex.map {
     case (event, i) =>
       val latency = i % 3 match {
         case 0 => 50
@@ -25,6 +25,6 @@ object TestMessages {
         case _ => 150
       }
       val to = event.swapAfter(latency)
-      MessageExchanged(i.toString, MessageExchanged.Coord(event.from, event.timestamp), MessageExchanged.Coord(to.from, to.timestamp))
+      Message(i.toString, Message.Coord(event.from, event.timestamp), Message.Coord(to.from, to.timestamp))
   }
 }

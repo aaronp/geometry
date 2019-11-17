@@ -9,7 +9,7 @@ import scalatags.JsDom.all._
   * @param initialContext
   * @param messages
   */
-case class Controls(initialContext: RenderContext, messages: Seq[MessageExchanged]) {
+case class Controls(initialContext: RenderContext, messages: Seq[Message]) {
 
   private var state       = MessageState(messages, 1)
   private var latestGraph = state.render(initialContext)

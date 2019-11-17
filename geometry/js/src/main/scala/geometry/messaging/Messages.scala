@@ -29,7 +29,7 @@ object Messages {
     renderMessages(controlsContainer, ctxt, messages)
   }
 
-  def renderMessages(controlsContainer: Div, ctxt: RenderContext, messages: Observable[MessageExchanged]) = {
+  def renderMessages(controlsContainer: Div, ctxt: RenderContext, messages: Observable[Message]) = {
 
     // TODO - fix this
     messages.toListL.runToFuture.foreach { batch =>
