@@ -1,23 +1,28 @@
 package geometry.messaging
 
+import geometry.HtmlUtils
 import monix.reactive.Observable
 
 import scala.concurrent.Future
 
+/**
+  * The handle to something which supplies the messages
+  */
 trait MessageApi {
   def from(epochMillisUTC: Long): Observable[Message]
 
-  def minEventTime : Future[Long]
+  def minEventTime(): Long
 }
 
 object MessageApi {
-  def test(): MessageApi = new MessageApi {
+  def test() = new MessageApi {
     val data = TestMessages.testMessages
-    override def from(epochMillisUTC: Long): Observable[Message] = {
+    def from(epochMillisUTC: Long): Observable[Message] = {
+      HtmlUtils.log(s"msgs from $epochMillisUTC")
       Observable.fromIterable(data).filter(_.from.timestamp >= epochMillisUTC)
     }
 
-    override def minEventTime: Future[Long] = Future.successful(data.map(_.from.timestamp).min)
+    override def minEventTime = data.map(_.from.timestamp).min
   }
 
   object TestMessages {
@@ -35,7 +40,7 @@ object MessageApi {
       EventData("j", "foo", "fizz", 775, "data"),
       EventData("k", "bar", "bla", 805, "data"),
       EventData("l", "foo", "fizz", 815, "data")
-    )
+    ).map(e => e.copy(timestamp = e.timestamp + System.currentTimeMillis()))
 
     val testMessages: List[Message] = events.zipWithIndex.map {
       case (event, i) =>

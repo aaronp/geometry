@@ -14,7 +14,7 @@ val scalaVersions       = Seq(scalaTwelve, scalaThirteen)
 
 crossScalaVersions := scalaVersions
 organization := s"com.github.${username}"
-scalaVersion := defaultScalaVersion
+ThisBuild / scalaVersion := defaultScalaVersion
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 enablePlugins(GhpagesPlugin)

@@ -39,7 +39,7 @@ case class Polygon(points: Seq[Point]) {
 
   def clip(bounds: Rectangle): Polygon = {
     val allEdges = edges
-    if (allEdges.isEmpty) {
+    if (allEdges.iterator.isEmpty) {
       // we can technically have a polygon of just one point
       if (points.isEmpty) {
         this

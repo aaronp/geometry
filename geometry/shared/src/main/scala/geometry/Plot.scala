@@ -60,7 +60,7 @@ object Plot {
 
     def render(space: Char = ' '): String = {
       val cachedMinX = minX
-      val asciiRows  = rowByYCoord.mapValues(_.render(cachedMinX, space)).withDefault(_ => "")
+      val asciiRows  = rowByYCoord.mapValues(_.render(cachedMinX, space)).toMap.withDefault(_ => "")
       (y1 to y2 by -1).map(asciiRows).mkString(Platform.EOL)
     }
 

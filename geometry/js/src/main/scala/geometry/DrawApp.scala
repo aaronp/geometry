@@ -11,7 +11,6 @@ import scalatags.JsDom.all._
 import scala.collection.mutable.ArrayBuffer
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-//@JSExportTopLevel("DrawApp")
 /**
   * see https://github.com/lihaoyi/workbench-example-app/tree/dodge-the-dots
   * http://www.lihaoyi.com/hands-on-scala-js/
@@ -107,7 +106,7 @@ object DrawApp {
 
     def onMouseMove(e: MouseEvent) = {
       val mouse = asPoint(e)
-      drawLines(canvas, ctxt, buffer, mouse)
+      drawLines(canvas, ctxt, buffer.toSeq, mouse)
       logAngle(mouse)
     }
 
@@ -121,7 +120,7 @@ object DrawApp {
       }
     }
     def logAngle(point: Point) = {
-      buffer.takeRight(2) match {
+      buffer.takeRight(2).toSeq match {
         case Seq(a, b) =>
           val line1 = LineSegment(a, b)
           val line2 = LineSegment(b, point)
@@ -138,7 +137,7 @@ object DrawApp {
 
     def onMouseUp(e: MouseEvent) = {
       downPoint = None
-      drawLines(canvas, ctxt, buffer, asPoint(e))
+      drawLines(canvas, ctxt, buffer.toSeq, asPoint(e))
     }
 
     def onMouseDown(e: MouseEvent) = {
@@ -149,11 +148,9 @@ object DrawApp {
 
       previousPoint.foreach { before =>
         val line = LineSegment(before, firstPoint)
-//        appendPar(logDiv, s"${line}")
-
         logDiv.appendChild(div(span(s"${line}"), br()).render)
       }
-      drawLines(canvas, ctxt, buffer, asPoint(e))
+      drawLines(canvas, ctxt, buffer.toSeq, asPoint(e))
     }
 
     def isDown = downPoint.nonEmpty
@@ -191,9 +188,9 @@ object DrawApp {
     def onMouseMove(e: MouseEvent) = {
       if (isDown) {
         addNewPoint(asPoint(e))
-        drawPolys(canvas, ctxt, Polygon(buffer.toList) +: polys, asPoint(e), false)
+        drawPolys(canvas, ctxt, (Polygon(buffer.toList) +: polys).toSeq, asPoint(e), false)
       } else {
-        drawPolys(canvas, ctxt, polys, asPoint(e), true)
+        drawPolys(canvas, ctxt, polys.toSeq, asPoint(e), true)
       }
     }
 
@@ -204,7 +201,7 @@ object DrawApp {
         addNewPoint(firstPoint)
         polys += Polygon(buffer.toList)
         resetBuffer()
-        drawPolys(canvas, ctxt, polys, asPoint(e), true)
+        drawPolys(canvas, ctxt, polys.toSeq, asPoint(e), true)
       }
       downPoint = None
       dom.window.console.log(s"downPoint is : $downPoint")
