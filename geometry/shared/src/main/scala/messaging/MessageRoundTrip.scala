@@ -26,4 +26,9 @@ final case class MessageRoundTrip(id: String, from: MessageRoundTrip.Coord, to: 
 
 object MessageRoundTrip {
   final case class Coord(name: String, timestamp: Long)
+
+  def apply(id: String, from: (String, Long), to: (String, Long)): MessageRoundTrip = {
+    new MessageRoundTrip(id, Coord(from._1, from._2), Coord(to._1, to._2))
+  }
+
 }

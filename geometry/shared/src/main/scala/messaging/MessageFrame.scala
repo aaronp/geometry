@@ -1,8 +1,6 @@
 package messaging
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{Await, Future}
-import scala.util.Try
 
 /**
   * Each tick (which comes perhaps every few hundred milliseconds)
@@ -32,7 +30,7 @@ final case class MessageFrame[F[_]](currentTimestampUTC: Long, batchSize: Finite
     }
   }
 
-  def update(tick: Long, api: MessageApi[F])(implicit eval: MessageFrame.Eval[F]): MessageFrame[F] = {
+  def update(tick: Long, api: MessageApi[F])(implicit eval: Eval[F]): MessageFrame[F] = {
     batch match {
       case None => swap(tick, api.minEventTime(), api)
       case Some(msgBatch) =>
@@ -46,13 +44,13 @@ final case class MessageFrame[F[_]](currentTimestampUTC: Long, batchSize: Finite
     }
   }
 
-  private def reload(queryFromRange: Long, api: MessageApi[F])(implicit eval: MessageFrame.Eval[F]): MessageFrame[F] = {
+  private def reload(queryFromRange: Long, api: MessageApi[F])(implicit eval: Eval[F]): MessageFrame[F] = {
     val nextRange  = Range(queryFromRange, queryFromRange + batchSize.toMillis)
     val newBatch   = eval.eval(api.query(nextRange))
     val eagerFetch = api.query(Range(nextRange.to, nextRange.to + batchSize.toMillis))
-    copy(batch = Option(newBatch), nextBatchFuture = Option(eagerFetch))
+    copy(currentTimestampUTC = queryFromRange, batch = Option(newBatch), nextBatchFuture = Option(eagerFetch))
   }
-  private def swap(tick: Long, queryFromRange: Long, api: MessageApi[F])(implicit eval: MessageFrame.Eval[F]) = {
+  private def swap(tick: Long, queryFromRange: Long, api: MessageApi[F])(implicit eval: Eval[F]) = {
     nextBatchFuture match {
       case Some(inFlightResult) =>
         // block on our request
@@ -60,7 +58,7 @@ final case class MessageFrame[F[_]](currentTimestampUTC: Long, batchSize: Finite
         if (nextBatch.queryRange.contains(tick)) {
           // hurrah - our eager fetch worked
           val nextRange = Range(queryFromRange, queryFromRange + batchSize.toMillis)
-          copy(batch = Option(nextBatch), nextBatchFuture = Option(api.query(nextRange)))
+          copy(currentTimestampUTC = tick, batch = Option(nextBatch), nextBatchFuture = Option(api.query(nextRange)))
         } else {
           // cache miss - we need to query for this explicit tick
           reload(tick, api)
@@ -68,32 +66,6 @@ final case class MessageFrame[F[_]](currentTimestampUTC: Long, batchSize: Finite
       case None =>
         // oops - we've not queried yet... ?
         reload(tick, api)
-    }
-  }
-}
-
-object MessageFrame {
-
-  /**
-    * An typeclass which provides an unsafe means to get the value from within a parameterized type
-    * @tparam F
-    */
-  trait Eval[F[_]] {
-    def eval[A](f: F[A]): A
-  }
-
-  object Eval {
-    def apply[F[_]](implicit inst: Eval[F]): Eval[F] = inst
-    def forFuture(timeout: FiniteDuration): Eval[Future] = new Eval[Future] {
-      override def eval[A](f: Future[A]): A = {
-        Await.result(f, timeout)
-      }
-    }
-    implicit object IdInstance extends Eval[cats.Id] {
-      override def eval[A](value: cats.Id[A]): A = value
-    }
-    implicit object TryInstance extends Eval[Try] {
-      override def eval[A](value: Try[A]): A = value.get
     }
   }
 }

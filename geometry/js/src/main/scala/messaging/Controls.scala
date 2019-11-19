@@ -1,7 +1,6 @@
 package messaging
 
 import cats.kernel.Eq
-import messaging.MessageFrame.Eval
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import monix.reactive.Observable
@@ -65,14 +64,15 @@ object Controls {
 }
 
 /**
-  * A handle on the messaging controls
+  * A handle on the messaging controls (speed and time offset).
+  *
+  * The goal is to provide a ticking window of messages with
   */
-class Controls[F[_]](api: MessageApi[F], //
-                     tickFrequency: FiniteDuration, //
-                     debounceTimeout: FiniteDuration, //
-                     batchSize: FiniteDuration,        //
-                     percentageAsTime: Double => Long) //
-(implicit eval: MessageFrame.Eval[F]) //
+class Controls[F[_]](api: MessageApi[F],                                       //
+                     tickFrequency: FiniteDuration,                            //
+                     debounceTimeout: FiniteDuration,                          //
+                     batchSize: FiniteDuration,                                //
+                     percentageAsTime: Double => Long)(implicit eval: Eval[F]) //
 {
 
   import Controls._
@@ -88,9 +88,7 @@ class Controls[F[_]](api: MessageApi[F], //
     Task(currentTime.innerText = tick.instant.toString)
   }
 
-  /**
-    * A regular feed of timestamps which should be rendered, controlled by user controls for speed and the timestamp offset
-    * @return
+  /** @return a regular feed of timestamps which should be rendered, controlled by user controls for speed and the timestamp offset
     */
   def timeOffsets: Observable[TickState] = {
     implicit val eq                   = Eq.fromUniversalEquals[Long]
@@ -107,14 +105,15 @@ class Controls[F[_]](api: MessageApi[F], //
     observable.doOnNext(updateCurrentTime)
   }
 
-  def batches: Observable[MessageFrame[F]] = {
+  /** @return a sliding window of messages for a timestamp
+    */
+  def messages: Observable[MessageFrame[F]] = {
     val initialFrame = MessageFrame[F](0, batchSize, None, None)
     timeOffsets.scan(initialFrame) {
       case (frame, tick) =>
         frame.update(tick.timeOffset, api)
     }
   }
-  def messageFlow = batches.map(_.messagesForTimestamp)
 
   def render: Div = {
     div(

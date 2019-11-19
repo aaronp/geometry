@@ -12,7 +12,5 @@ object Build {
     "-language:reflectiveCalls", // Allow reflective calls
     "-language:higherKinds",         // Allow higher-kinded types
     "-language:implicitConversions", // Allow definition of implicit functions called views
-    //"-Xlog-implicits",
-    "-Xfuture" // Turn on future language features.
   )
 }
