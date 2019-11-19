@@ -1,7 +1,7 @@
-package geometry.messaging
+package messaging
 
 import geometry._
-import geometry.messaging.InFlightRenderedGraph._
+import messaging.InFlightRenderedGraph._
 
 /**
   * A representation of the in-flight messages as draw so that we can check mouse-overs for the various nodes/messages

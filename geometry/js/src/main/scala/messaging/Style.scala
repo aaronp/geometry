@@ -1,4 +1,4 @@
-package geometry.messaging
+package messaging
 
 final case class Style(circleRadius: Double, nodeRadius: Double, messageNodeRadius: Double) {
   def colorFor(nodeIndex: Int, totalIndices: Int): String = {

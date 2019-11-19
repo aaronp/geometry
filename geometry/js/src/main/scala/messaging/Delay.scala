@@ -1,4 +1,4 @@
-package geometry.messaging
+package messaging
 
 import scala.concurrent._
 import scala.scalajs.js

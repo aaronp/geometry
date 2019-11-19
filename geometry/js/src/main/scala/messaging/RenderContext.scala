@@ -1,4 +1,4 @@
-package geometry.messaging
+package messaging
 
 import geometry.Point
 import org.scalajs.dom.CanvasRenderingContext2D

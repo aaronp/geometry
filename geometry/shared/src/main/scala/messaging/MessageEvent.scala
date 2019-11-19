@@ -1,4 +1,4 @@
-package geometry.messaging
+package messaging
 
 sealed trait MessageEvent[A] {
   def event: EventData[A]

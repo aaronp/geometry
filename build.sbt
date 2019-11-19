@@ -137,7 +137,12 @@ lazy val geometry = crossProject(JSPlatform, JVMPlatform)
     siteSubdirName in SiteScaladoc := "api/latest"
   )
   .jsSettings(name := "geometry-js")
-  .jsSettings(libraryDependencies ++= List("com.lihaoyi" %%% "scalatags" % "0.7.0", "org.scala-js" %%% "scalajs-dom" % "0.9.7"))
+  .jsSettings(
+    libraryDependencies ++= List(
+      "com.lihaoyi"  %%% "scalatags"         % "0.7.0",
+      "org.scala-js" %%% "scalajs-dom"       % "0.9.7",
+      "org.scala-js" %%% "scalajs-java-time" % "0.2.5"
+    ))
 
 lazy val geometryJVM = geometry.jvm
 lazy val geometryJS  = geometry.js

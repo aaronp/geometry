@@ -1,6 +1,7 @@
-package geometry.messaging
+package messaging
 
 import geometry.HtmlUtils
+import messaging.MessageFrame.Eval
 import org.scalajs.dom
 import org.scalajs.dom.html.Div
 
@@ -25,19 +26,18 @@ object Messages {
 
     val controlsContainer: Div = HtmlUtils.divById(controlsDivId)
 
-    val api: MessageApi = MessageApi.test()
+    val api = MessageApi.test()
     renderMessages(controlsContainer, ctxt, api)
   }
 
-  def renderMessages(controlsContainer: Div, ctxt: RenderContext, api: MessageApi) = {
+  def renderMessages[F[_] : Eval](controlsContainer: Div, ctxt: RenderContext, api: MessageApi[F]) = {
 
     val control = Controls(api)
     controlsContainer.innerHTML = ""
     controlsContainer.appendChild(control.render)
 
-    control.messageFlow.foreach { msg =>
+    control.timeOffsets.foreach { msg =>
       HtmlUtils.log(msg.toString)
     }
-
   }
 }
