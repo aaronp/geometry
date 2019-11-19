@@ -25,6 +25,13 @@ import scala.util.Try
   */
 final case class MessageFrame[F[_]](currentTimestampUTC: Long, batchSize: FiniteDuration, batch: Option[MessageBatch], nextBatchFuture: Option[F[MessageBatch]]) {
 
+  def messagesForTimestamp: Seq[MessageRoundTrip] = {
+    batch.fold(Seq.empty[MessageRoundTrip]) { b =>
+      val filtered: Seq[MessageRoundTrip] = b.results.filter(_.contains(currentTimestampUTC))
+      filtered
+    }
+  }
+
   def update(tick: Long, api: MessageApi[F])(implicit eval: MessageFrame.Eval[F]): MessageFrame[F] = {
     batch match {
       case None => swap(tick, api.minEventTime(), api)

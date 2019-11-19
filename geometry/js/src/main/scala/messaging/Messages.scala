@@ -30,7 +30,7 @@ object Messages {
     renderMessages(controlsContainer, ctxt, api)
   }
 
-  def renderMessages[F[_] : Eval](controlsContainer: Div, ctxt: RenderContext, api: MessageApi[F]) = {
+  def renderMessages[F[_]: Eval](controlsContainer: Div, ctxt: RenderContext, api: MessageApi[F]) = {
 
     val control = Controls(api)
     controlsContainer.innerHTML = ""

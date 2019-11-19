@@ -1,11 +1,8 @@
 package messaging
 
-import java.time.Instant
-
-import cats.Id
 import cats.kernel.Eq
-import geometry.HtmlUtils
 import messaging.MessageFrame.Eval
+import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import monix.reactive.Observable
 import monix.reactive.subjects.Var
@@ -58,36 +55,25 @@ object Controls {
 
   import scala.concurrent.duration._
 
-  def apply[F[_] : Eval](api: MessageApi[F], tickFrequency: FiniteDuration = 200.millis, debounceTimeout: FiniteDuration = 500.millis): Controls = {
-    new Controls(api, tickFrequency, debounceTimeout, percentageAsTime(api.minEventTime, _))
+  def apply[F[_]: Eval](api: MessageApi[F],
+                        tickFrequency: FiniteDuration = 200.millis,
+                        debounceTimeout: FiniteDuration = 500.millis,
+                        batchQuerySize: FiniteDuration = 10.seconds) = {
+    new Controls(api, tickFrequency, debounceTimeout, batchQuerySize, percentageAsTime(api.minEventTime, _))
   }
 
-  case class TickState(lastSetOffset: Long, previousTimeOffset: Long, timeOffset: Long) {
-    def previousInstant = Instant.ofEpochMilli(previousTimeOffset)
-    def instant         = Instant.ofEpochMilli(timeOffset)
-//    override def toString: String = s"{prev:$previousInstant, time:$instant}"
-    def asRange(tickFrequency: FiniteDuration) =
-      if (previousTimeOffset <= timeOffset) {
-        Range(previousTimeOffset, timeOffset)
-      } else {
-        Range(timeOffset, timeOffset + tickFrequency.toMillis)
-      }
-    def moveTo(newLastSetOffset: Long, newTime: Long): TickState = {
-      copy(lastSetOffset = newLastSetOffset, previousTimeOffset = timeOffset, timeOffset = newTime)
-    }
-
-    def advance(newLastSetOffset: Long, tickFrequency: FiniteDuration, speedPercentage: Double): TickState = {
-      val newTime = timeOffset + ((tickFrequency.toMillis * speedPercentage).toLong)
-      moveTo(newLastSetOffset, newTime)
-    }
-    def isIncreasing = timeOffset >= previousTimeOffset
-  }
 }
 
 /**
   * A handle on the messaging controls
   */
-class Controls(api: MessageApi[cats.Id], tickFrequency: FiniteDuration, debounceTimeout: FiniteDuration, batchQueryRange: FiniteDuration, percentageAsTime: Double => Long) {
+class Controls[F[_]](api: MessageApi[F], //
+                     tickFrequency: FiniteDuration, //
+                     debounceTimeout: FiniteDuration, //
+                     batchSize: FiniteDuration,        //
+                     percentageAsTime: Double => Long) //
+(implicit eval: MessageFrame.Eval[F]) //
+{
 
   import Controls._
 
@@ -96,10 +82,20 @@ class Controls(api: MessageApi[cats.Id], tickFrequency: FiniteDuration, debounce
   private val timeSlider  = new Slider(1000, 1000, pcnt => s"${(pcnt * 100).toInt}%")
   private val speedSlider = new Slider(500, 1000, (percentAsSpeed _).andThen(speed => s"speed: ${speed}x "))
 
+  private val currentTime = div().render
+
+  private def updateCurrentTime(tick: TickState): Task[Unit] = {
+    Task(currentTime.innerText = tick.instant.toString)
+  }
+
+  /**
+    * A regular feed of timestamps which should be rendered, controlled by user controls for speed and the timestamp offset
+    * @return
+    */
   def timeOffsets: Observable[TickState] = {
     implicit val eq                   = Eq.fromUniversalEquals[Long]
     val timeOffsets: Observable[Long] = timeSlider.percentageFeed(debounceTimeout).map(percentageAsTime).distinctUntilChanged
-    Observable.interval(tickFrequency).combineLatest(timeOffsets).scan(TickState(0, 0, 0)) {
+    val observable = Observable.interval(tickFrequency).combineLatest(timeOffsets).scan(TickState(0, 0, 0)) {
       case (state, (_, offset)) =>
         if (state.lastSetOffset == offset) {
           state.advance(offset, tickFrequency, percentAsSpeed(speedSlider.currentPercentage()))
@@ -107,24 +103,24 @@ class Controls(api: MessageApi[cats.Id], tickFrequency: FiniteDuration, debounce
           state.moveTo(offset, offset)
         }
     }
+
+    observable.doOnNext(updateCurrentTime)
   }
 
-  def batches = {
-
-    timeOffsets.scan()
-    ???
-  }
-  def messageFlow: Observable[MessageRoundTrip] = {
-    // a stream which ends once the user
-    timeOffsets.flatMap { tick =>
-      api.query(tick.asRange(tickFrequency))
+  def batches: Observable[MessageFrame[F]] = {
+    val initialFrame = MessageFrame[F](0, batchSize, None, None)
+    timeOffsets.scan(initialFrame) {
+      case (frame, tick) =>
+        frame.update(tick.timeOffset, api)
     }
   }
+  def messageFlow = batches.map(_.messagesForTimestamp)
 
   def render: Div = {
     div(
       div(span("Time:"), timeSlider.render),
-      div(span("Speed:"), speedSlider.render)
+      div(span("Speed:"), speedSlider.render),
+      div(span("Current Time:"), currentTime.render)
     ).render
   }
 }
