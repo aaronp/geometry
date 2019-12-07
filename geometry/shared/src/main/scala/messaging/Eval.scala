@@ -4,7 +4,6 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
-
 /**
   * An typeclass which provides an unsafe means to get the value from within a parameterized type
   *

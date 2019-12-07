@@ -22,8 +22,8 @@ enablePlugins(GitVersioning)
 enablePlugins(SiteScaladocPlugin)
 
 // see http://scalameta.org/scalafmt/
-scalafmtOnCompile in ThisBuild := true
-scalafmtVersion in ThisBuild := "1.4.0"
+smessaging.MessageFrameTestcalafmtOnCompile in ThisBuild := true
+//scalafmtVersion in ThisBuild := "1.5.1"
 
 // Define a `Configuration` for each project, as per http://www.scala-sbt.org/sbt-site/api-documentation.html
 val Geometry = config("geometryJVM")
@@ -47,7 +47,7 @@ val circeDependencies = List("circe-core", "circe-generic", "circe-parser", "cir
 
 val testDependencies = List(
   "junit"                  % "junit"      % "4.12"  % "test",
-  "org.scalatest"          %% "scalatest" % "3.0.8" % "test",
+  "org.scalatest"          %% "scalatest" % "3.1.0" % "test",
   "org.scala-lang.modules" %% "scala-xml" % "1.2.0" % "test",
   "org.pegdown"            % "pegdown"    % "1.6.0" % "test"
 )
@@ -66,7 +66,7 @@ lazy val scaladocSiteSettings = scaladocSiteProjects.flatMap {
   case _ => Nil // ignore cross-projects
 }
 
-lazy val settings = scalafmtSettings
+///lazy val settings = scalafmtSettings
 
 val commonSettings: Seq[Def.Setting[_]] = Seq(
   //version := parentProject.settings.ver.value,

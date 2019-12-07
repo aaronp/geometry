@@ -1,7 +1,6 @@
 package messaging
 
 import geometry.HtmlUtils
-import messaging.MessageFrame.Eval
 import org.scalajs.dom
 import org.scalajs.dom.html.Div
 

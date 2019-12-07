@@ -16,11 +16,11 @@ object MessageApi {
   def test() = fixed(TestMessages.testMessages)
 
   class Fixed(data: Seq[MessageRoundTrip]) extends MessageApi[cats.Id] {
-      override def query(timeRange: Range) = {
-        MessageBatch(timeRange, data.filter(_.inRange(timeRange)))
-      }
+    override def query(timeRange: Range) = {
+      MessageBatch(timeRange, data.filter(_.inRange(timeRange)))
+    }
 
-      override def minEventTime = data.map(_.from.timestamp).min
+    override def minEventTime = data.map(_.from.timestamp).min
 
   }
   def fixed(data: Seq[MessageRoundTrip]): MessageApi[Id] = new Fixed(data)
