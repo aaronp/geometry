@@ -105,7 +105,7 @@ object DrawApp {
 
     def onMouseMove(e: MouseEvent) = {
       val mouse = asPoint(e)
-      drawLines(canvas, ctxt, buffer.toSeq, mouse)
+      drawLines(canvas, ctxt, buffer, mouse)
       logAngle(mouse)
     }
 
@@ -136,7 +136,7 @@ object DrawApp {
 
     def onMouseUp(e: MouseEvent) = {
       downPoint = None
-      drawLines(canvas, ctxt, buffer.toSeq, asPoint(e))
+      drawLines(canvas, ctxt, buffer, asPoint(e))
     }
 
     def onMouseDown(e: MouseEvent) = {
@@ -149,7 +149,7 @@ object DrawApp {
         val line = LineSegment(before, firstPoint)
         logDiv.appendChild(div(span(s"${line}"), br()).render)
       }
-      drawLines(canvas, ctxt, buffer.toSeq, asPoint(e))
+      drawLines(canvas, ctxt, buffer, asPoint(e))
     }
 
     def isDown = downPoint.nonEmpty
@@ -187,9 +187,9 @@ object DrawApp {
     def onMouseMove(e: MouseEvent) = {
       if (isDown) {
         addNewPoint(asPoint(e))
-        drawPolys(canvas, ctxt, (Polygon(buffer.toList) +: polys).toSeq, asPoint(e), false)
+        drawPolys(canvas, ctxt, (Polygon(buffer.toList) +: polys), asPoint(e), false)
       } else {
-        drawPolys(canvas, ctxt, polys.toSeq, asPoint(e), true)
+        drawPolys(canvas, ctxt, polys, asPoint(e), true)
       }
     }
 
@@ -200,7 +200,7 @@ object DrawApp {
         addNewPoint(firstPoint)
         polys += Polygon(buffer.toList)
         resetBuffer()
-        drawPolys(canvas, ctxt, polys.toSeq, asPoint(e), true)
+        drawPolys(canvas, ctxt, polys, asPoint(e), true)
       }
       downPoint = None
       dom.window.console.log(s"downPoint is : $downPoint")

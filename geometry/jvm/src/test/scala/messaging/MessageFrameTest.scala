@@ -18,12 +18,12 @@ class MessageFrameTest extends WordSpec with Matchers {
       val updatedFrame: MessageFrame[Id] = MessageFrame[cats.Id](0, 10.seconds, None, None).update(tickTime, api)
       updatedFrame.currentTimestampUTC shouldBe tickTime
     }
-    "swap into the current batch the fetched batch when the tick time is not contained in that batch" in {
-      ???
-    }
-    "make a query for the tick value when the tick time is not contained in the current or future batch" in {
-      ???
-    }
+//    "swap into the current batch the fetched batch when the tick time is not contained in that batch" in {
+//      ???
+//    }
+//    "make a query for the tick value when the tick time is not contained in the current or future batch" in {
+//      ???
+//    }
   }
 
   class TestApi(data: Seq[MessageRoundTrip]) extends MessageApi.Fixed(data) {

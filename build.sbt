@@ -74,7 +74,6 @@ val commonSettings: Seq[Def.Setting[_]] = Seq(
   crossScalaVersions := scalaVersions,
   libraryDependencies ++= testDependencies,
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-  scalacOptions ++= scalacSettings,
   buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
   buildInfoPackage := s"${repo}.build",
   test in assembly := {},
@@ -120,7 +119,7 @@ lazy val geometry = crossProject(JSPlatform, JVMPlatform)
   //.enablePlugins(TestNGPlugin)
   .settings(name := "geometry")
   .settings(libraryDependencies ++= monix.map { art =>
-    "io.monix" %%% art % "3.1.0"
+    "io.monix" %%% art % "3.2.1"
   })
   .in(file("geometry"))
   .jvmSettings(commonSettings: _*)
@@ -137,7 +136,8 @@ lazy val geometry = crossProject(JSPlatform, JVMPlatform)
     scalaVersion := defaultScalaVersion)
   .jsSettings(libraryDependencies ++= List(
     "com.lihaoyi" %%% "scalatags" % "0.9.1",
-    "org.scala-js" %%% "scalajs-dom" % "1.0.0"))
+    "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+    "org.scala-js" %%% "scalajs-java-time" % "1.0.0"))
 
 lazy val geometryJVM = geometry.jvm
 lazy val geometryJS  = geometry.js
