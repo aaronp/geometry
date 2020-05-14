@@ -3,10 +3,13 @@ package geometry
 import geometry.Plot.Layout.AsciiRectangle
 
 final case class Rectangle private (topLeft: Point, bottomRight: Point) {
-  def x1                     = topLeft.x
-  def y1                     = topLeft.y
-  def x2                     = bottomRight.x
-  def y2                     = bottomRight.y
+  def x1   = topLeft.x
+  def y1   = topLeft.y
+  def x2   = bottomRight.x
+  def y2   = bottomRight.y
+  def midY = y1 + ((y2 - y1) / 2)
+  def midX = x1 + ((x2 - x1) / 2)
+
   def contains(point: Point) = containsX(point.x) && containsY(point.y)
   def containsX(xValue: Double) = {
     xValue >= topLeft.x && xValue <= bottomRight.x
