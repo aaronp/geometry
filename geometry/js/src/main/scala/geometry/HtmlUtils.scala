@@ -78,14 +78,9 @@ trait HtmlUtils {
   }
 
   /**
-    * Thanks SO!
-    * https://stackoverflow.com/questions/503093/how-do-i-redirect-to-another-webpage
-    *
     * @param page the page the URL to go to
     */
-  def gotoLink(page: String) = {
-    window.location.href = page
-  }
+  def gotoLink(page: String) = window.location.href = page
 
   def showAlert(text: String): Unit = {
     dom.window.alert(text)

@@ -46,14 +46,14 @@ object DrawApp {
     canvas.onmousemove = state.onMouseMove
   }
 
-  def drawPolys(canvas: html.Canvas, ctxt: CanvasRenderingContext2D, data: Seq[Polygon], mousePos: Point, highlight: Boolean) = {
+  private def drawPolys(canvas: html.Canvas, ctxt: CanvasRenderingContext2D, data: ArrayBuffer[Polygon], mousePos: Point, highlight: Boolean) = {
     clear(canvas, ctxt)
     data.foreach { poly =>
       val ok = highlight && poly.contains(mousePos)
       draw(canvas, ctxt, poly.points, "red", ok)
     }
   }
-  def drawLines(canvas: html.Canvas, ctxt: CanvasRenderingContext2D, data: Seq[Point], mousePos: Point) = {
+  private def drawLines(canvas: html.Canvas, ctxt: CanvasRenderingContext2D, data: ArrayBuffer[Point], mousePos: Point) = {
     clear(canvas, ctxt)
 
     (data :+ mousePos) match {
@@ -65,7 +65,6 @@ object DrawApp {
         tail.foreach {
           case Point(x, y) => ctxt.lineTo(x, y)
         }
-//        ctxt.closePath()
         ctxt.stroke()
     }
   }

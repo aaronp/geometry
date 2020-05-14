@@ -7,10 +7,9 @@ val repo = "geometry"
 name := repo
 
 val username            = "aaronp"
-val scalaTwelve         = "2.12.10"
-val scalaThirteen       = "2.13.0"
+val scalaThirteen       = "2.13.2"
 val defaultScalaVersion = scalaThirteen
-val scalaVersions       = Seq(scalaTwelve, scalaThirteen)
+val scalaVersions       = Seq(scalaThirteen)
 
 crossScalaVersions := scalaVersions
 organization := s"com.github.${username}"
@@ -22,8 +21,7 @@ enablePlugins(GitVersioning)
 enablePlugins(SiteScaladocPlugin)
 
 // see http://scalameta.org/scalafmt/
-smessaging.MessageFrameTestcalafmtOnCompile in ThisBuild := true
-//scalafmtVersion in ThisBuild := "1.5.1"
+scalafmtOnCompile in ThisBuild := true
 
 // Define a `Configuration` for each project, as per http://www.scala-sbt.org/sbt-site/api-documentation.html
 val Geometry = config("geometryJVM")
@@ -47,8 +45,8 @@ val circeDependencies = List("circe-core", "circe-generic", "circe-parser", "cir
 
 val testDependencies = List(
   "junit"                  % "junit"      % "4.12"  % "test",
-  "org.scalatest"          %% "scalatest" % "3.1.0" % "test",
-  "org.scala-lang.modules" %% "scala-xml" % "1.2.0" % "test",
+  "org.scalatest"          %% "scalatest" % "3.1.2" % "test",
+  "org.scala-lang.modules" %% "scala-xml" % "1.3.0" % "test",
   "org.pegdown"            % "pegdown"    % "1.6.0" % "test"
 )
 
@@ -66,8 +64,6 @@ lazy val scaladocSiteSettings = scaladocSiteProjects.flatMap {
   case _ => Nil // ignore cross-projects
 }
 
-///lazy val settings = scalafmtSettings
-
 val commonSettings: Seq[Def.Setting[_]] = Seq(
   //version := parentProject.settings.ver.value,
   organization := s"com.github.${username}",
@@ -78,7 +74,7 @@ val commonSettings: Seq[Def.Setting[_]] = Seq(
   crossScalaVersions := scalaVersions,
   libraryDependencies ++= testDependencies,
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-  scalacOptions ++= Build.scalacSettings,
+  scalacOptions ++= scalacSettings,
   buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
   buildInfoPackage := s"${repo}.build",
   test in assembly := {},
@@ -121,7 +117,7 @@ lazy val root = (project in file("."))
 lazy val geometry = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .withoutSuffixFor(JVMPlatform)
-  .enablePlugins(TestNGPlugin)
+  //.enablePlugins(TestNGPlugin)
   .settings(name := "geometry")
   .settings(libraryDependencies ++= monix.map { art =>
     "io.monix" %%% art % "3.1.0"
@@ -136,13 +132,12 @@ lazy val geometry = crossProject(JSPlatform, JVMPlatform)
     // put scaladocs under 'api/latest'
     siteSubdirName in SiteScaladoc := "api/latest"
   )
-  .jsSettings(name := "geometry-js")
   .jsSettings(
-    libraryDependencies ++= List(
-      "com.lihaoyi"  %%% "scalatags"         % "0.7.0",
-      "org.scala-js" %%% "scalajs-dom"       % "0.9.7",
-      "org.scala-js" %%% "scalajs-java-time" % "0.2.5"
-    ))
+    name := "geometry-js",
+    scalaVersion := defaultScalaVersion)
+  .jsSettings(libraryDependencies ++= List(
+    "com.lihaoyi" %%% "scalatags" % "0.9.1",
+    "org.scala-js" %%% "scalajs-dom" % "1.0.0"))
 
 lazy val geometryJVM = geometry.jvm
 lazy val geometryJS  = geometry.js
