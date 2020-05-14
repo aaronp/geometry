@@ -25,10 +25,11 @@ case class Draw(canvas: Canvas) {
   def height = canvas.height
   def withColor[A](color: String)(thunk: => A) = {
     val before = context.strokeStyle
-    println(s"Using $color, before is $before")
     context.strokeStyle = color
     context.fillStyle = color
+    println(s"Using ${context.strokeStyle}, before is $before")
     val result = thunk
+    println(s"resetting ${context.strokeStyle} to $before")
     context.strokeStyle = before
     context.fillStyle = before
     result
@@ -46,8 +47,8 @@ case class Draw(canvas: Canvas) {
 
   def bezierBetween(from: Rectangle, to: Rectangle) = {
     context.moveTo(from.x2, from.midY)
-    context.bezierCurveTo(to.x1, from.midY, from.x1, to.midY, to.x1, to.midY)
-    context.stroke()
+    val midX = from.x2 + (to.x1 - from.x2)
+    context.bezierCurveTo(midX, from.midY, to.x1 - (to.x1 - from.x2), to.midY, to.x1, to.midY)
   }
 
   def clear() = {
