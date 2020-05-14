@@ -27,9 +27,7 @@ case class Draw(canvas: Canvas) {
     val before = context.strokeStyle
     context.strokeStyle = color
     context.fillStyle = color
-    println(s"Using ${context.strokeStyle}, before is $before")
     val result = thunk
-    println(s"resetting ${context.strokeStyle} to $before")
     context.strokeStyle = before
     context.fillStyle = before
     result
@@ -47,8 +45,12 @@ case class Draw(canvas: Canvas) {
 
   def bezierBetween(from: Rectangle, to: Rectangle) = {
     context.moveTo(from.x2, from.midY)
-    val midX = from.x2 + (to.x1 - from.x2)
-    context.bezierCurveTo(midX, from.midY, to.x1 - (to.x1 - from.x2), to.midY, to.x1, to.midY)
+//    val scale = 0.35
+    val scale = 0.35
+    val midX  = from.x2 + ((to.x1 - from.x2) * scale)
+    val m2    = to.x1 - ((to.x1 - from.x2) * scale)
+    context.bezierCurveTo(midX, from.midY, m2, to.midY, to.x1, to.midY)
+//    context.bezierCurveTo(midX, from.midY, to.x1, to.midY, to.x1, to.midY)
   }
 
   def clear() = {
