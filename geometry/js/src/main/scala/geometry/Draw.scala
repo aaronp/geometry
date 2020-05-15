@@ -23,6 +23,22 @@ case class Draw(canvas: Canvas) {
 
   def width  = canvas.width
   def height = canvas.height
+  def withFont[A](font: String)(thunk: => A) = {
+    val before = context.font
+    context.font = font
+
+    val a = thunk
+    context.font = before
+    a
+  }
+
+  def withTextAlign[A](align: String)(thunk: => A) = {
+    val before = context.textAlign
+    context.textAlign = align
+    val a = thunk
+    context.textAlign = before
+    a
+  }
   def withColor[A](color: String)(thunk: => A) = {
     val before = context.strokeStyle
     context.strokeStyle = color
@@ -33,14 +49,18 @@ case class Draw(canvas: Canvas) {
     result
   }
 
+  def draw(text: String, at: Point, maxWidth: Option[Int] = None) = {
+    val metrics = context.measureText(text)
+    maxWidth match {
+      case Some(w) =>
+        context.fillText(s"$text, width: ${metrics.width}", at.x, at.y, w)
+      case None =>
+        context.fillText(s"$text, width: ${metrics.width}", at.x, at.y)
+    }
+  }
   def draw(rectangle: Rectangle) = {
     import rectangle._
-    context.moveTo(x1, y1)
-    context.lineTo(x2, y1)
-    context.lineTo(x2, y2)
-    context.lineTo(x1, y2)
-    context.lineTo(x1, y1)
-    context.stroke()
+    context.strokeRect(x1, y2, rectangle.width, rectangle.height)
   }
 
   def bezierBetween(from: Rectangle, to: Rectangle) = {

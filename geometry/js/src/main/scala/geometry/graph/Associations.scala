@@ -16,23 +16,7 @@ object Associations {
     Graph(Seq(e1, e2), Set("1" -> "2"))
   }
 
-//  class Elm(override val toString: String, originalUpdate: Draw => Unit) {
-//    private var update = originalUpdate
-//    def update(newUpdate: Draw => Unit) = {
-//      update = newUpdate
-//    }
-//    def draw(d: Draw) = update.apply(d)
-//    override def equals(obj: Any): Boolean = {
-//      obj match {
-//        case e: Elm => toString == e.toString
-//        case _      => false
-//      }
-//    }
-//    override def hashCode(): Int = toString.hashCode
-//  }
-//  object Elm {
-//    def apply(f: Draw => Unit) = new Elm(UUID.randomUUID().toString, f)
-//  }
+  case class RelatedRecord(id: String, title: String) {}
 
   @JSExport
   def render(controlsDivId: String, containerId: String) = {
@@ -59,8 +43,15 @@ object Associations {
         draw.context.beginPath()
         draw.draw(rectangle1)
         draw.draw(rectangle2)
+
         draw.bezierBetween(rectangle1, rectangle2)
         draw.context.stroke()
+      }
+
+      draw.withFont("30px Arial") {
+        draw.withColor("blue") {
+          draw.draw("some text", Point(50, 60))
+        }
       }
     }
 
