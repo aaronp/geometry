@@ -21,6 +21,17 @@ case class Draw(canvas: Canvas) {
     case value: CanvasRenderingContext2D => value
   }
 
+  def autoResize(vertScale: Double = 1.0) = {
+    dom.window.onresize = e => {
+      resize(h = (dom.window.outerHeight * vertScale).toInt)
+    }
+  }
+
+  def resize(w: Int = dom.window.outerWidth, h: Int = dom.window.outerHeight) = {
+    canvas.width = w
+    canvas.height = h
+  }
+
   def width  = canvas.width
   def height = canvas.height
   def withFont[A](font: String)(thunk: => A) = {
@@ -43,6 +54,7 @@ case class Draw(canvas: Canvas) {
     val before = context.strokeStyle
     context.strokeStyle = color
     context.fillStyle = color
+    context.beginPath()
     val result = thunk
     context.strokeStyle = before
     context.fillStyle = before
@@ -58,6 +70,28 @@ case class Draw(canvas: Canvas) {
         context.fillText(s"$text, width: ${metrics.width}", at.x, at.y)
     }
   }
+
+  def draw(arc: Arc) = {
+    context.arc(arc.center.x, arc.center.y, arc.radius, arc.startRadian, arc.endRadian)
+  }
+
+  def draw(line: LineSegment) = {
+    context.moveTo(line.x1, line.y1)
+    context.lineTo(line.x2, line.y2)
+//    context.stroke()
+  }
+  def draw(polygon: Polygon) = {
+    polygon.points match {
+      case head +: tail =>
+        context.moveTo(head.x, head.y)
+        tail.foreach {
+          case Point(x, y) =>
+            context.lineTo(x, y)
+        }
+        context.lineTo(head.x, head.y)
+      case Seq() =>
+    }
+  }
   def draw(rectangle: Rectangle) = {
     import rectangle._
     context.strokeRect(x1, y2, rectangle.width, rectangle.height)
@@ -65,12 +99,10 @@ case class Draw(canvas: Canvas) {
 
   def bezierBetween(from: Rectangle, to: Rectangle) = {
     context.moveTo(from.x2, from.midY)
-//    val scale = 0.35
     val scale = 0.35
     val midX  = from.x2 + ((to.x1 - from.x2) * scale)
     val m2    = to.x1 - ((to.x1 - from.x2) * scale)
     context.bezierCurveTo(midX, from.midY, m2, to.midY, to.x1, to.midY)
-//    context.bezierCurveTo(midX, from.midY, to.x1, to.midY, to.x1, to.midY)
   }
 
   def clear() = {

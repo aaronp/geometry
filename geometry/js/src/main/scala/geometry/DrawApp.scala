@@ -3,9 +3,6 @@ package geometry
 import org.scalajs.dom
 import org.scalajs.dom.raw.{ClientRect, MouseEvent}
 import org.scalajs.dom.{CanvasRenderingContext2D, html}
-import geometry._
-import org.scalajs.dom
-import org.scalajs.dom.document
 import scalatags.JsDom.all._
 
 import scala.collection.mutable.ArrayBuffer
@@ -29,7 +26,6 @@ object DrawApp {
       case percent           => percent.toDouble
     }
     //Option(state).foreach(_.trimVertices(percentThreshold))
-
   }
 
   var state: State = null
