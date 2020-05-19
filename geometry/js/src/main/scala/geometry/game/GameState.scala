@@ -29,14 +29,15 @@ case class GameState(draw: Draw,
         updated.redraw()
         updated
 
-      case UpdatePlayer(cmd, _) =>
-        onCommand(cmd)
+      case UpdatePlayer(cmd, 1) => onCommand(cmd)
     }
   }
 
   override def toString: String = s"STATE: $p1"
   def redraw() = {
-    draw.clear()
+    draw.withColor("rgba(148, 131, 111,0.5)") {
+      draw.fill
+    }
     render(draw)
   }
 
@@ -51,12 +52,12 @@ case class GameState(draw: Draw,
       case Right =>
         copy(p1 = p1.changeVelocity(xDelta = speedInc))
       case RotateClockwise =>
-        copy(p1 = p1.rotate(-turnInc))
-      case RotateCounterClockwise =>
         copy(p1 = p1.rotate(turnInc))
+      case RotateCounterClockwise =>
+        copy(p1 = p1.rotate(-turnInc))
       case Shoot =>
         val bullet = p1.shoot()
-        println("pow! " + bullet)
+        assets.pew()
         copy(components = bullet :: components)
     }
   }

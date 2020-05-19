@@ -45,19 +45,21 @@
 }
 
 
+
     </style>
 </head>
-<body onload="Game.render('controls', 'target')">
+<body style="margin:0px;border:0px"  onload="Game.render('controls', 'target')">
 
 <!-- Assets -->
-<img id="ship1" style="display:none" src="img/ship1.png" />
+<img id="ship1" style="display:none" src="img/ship1.png"/>
 <audio id="sound-bang">
     <source src="sounds/bang.m4a" type="audio/x-m4a">
 </audio>
+<audio id="sound-pew">
+    <source src="sounds/pew.m4a" type="audio/x-m4a">
+</audio>
 
-<div style="border: solid 1px red">
-    <canvas id="target" style="display: block" id="canvas" width="500" height="1255"/>
-</div>
+<canvas id="target" style="display: block;margin:0px;border:0px" id="canvas" width="500" height="1255"/>
 
 <div id="controls">
 </div>

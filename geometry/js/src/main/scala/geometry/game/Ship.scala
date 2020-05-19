@@ -56,7 +56,7 @@ case class Ship(position: Point, color: String, weapon: Weapon = Gun(), directio
   def render(d: Draw, assets: Assets) = {
 
     // the png is facing upwards, not to the right (e.g. 0rad)
-    val shipRads = directionRads + (0.5 * Math.PI)
+    val shipRads = directionRads // directionRads + (0.5 * Math.PI)
     import d._
     context.translate(position.x, position.y)
     context.rotate(shipRads)

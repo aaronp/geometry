@@ -15,11 +15,13 @@ object Game {
     val draw = Draw(containerId)
     draw.autoResize(0.8)
 
-    gameLoop(GameState(draw, Assets("sound-bang")))
+//    testExplosion(draw)
+    gameLoop(GameState(draw, Assets()))
   }
 
   def testExplosion(draw: Draw) = {
     var expl = Explosion(Point(600, 600), Velocity(3, 8))
+//    var expl = Explosion(Point(600, 600), Velocity(0, 8))
     dom.window.onkeydown = e => {
       println(s"key=${e.key}, code=${e.keyCode}")
       expl = expl.incTime()
@@ -44,20 +46,20 @@ object Game {
 
   def publishMouseEventsTo(eventSubject: ConcurrentSubject[Event, Event]) = {
     dom.window.onkeydown = e => {
-      KeyMap.eventForKey(e.keyCode).foreach { event =>
+      KeyMap.eventFor(e).foreach { event =>
         e.stopPropagation()
         e.preventDefault()
         eventSubject.onNext(event)
       }
     }
     dom.window.onkeyup = e => {
-      KeyMap.eventForKey(e.keyCode).foreach { _ =>
+      KeyMap.eventFor(e).foreach { _ =>
         e.stopPropagation()
         e.preventDefault()
       }
     }
     dom.window.onkeypress = e => {
-      KeyMap.eventForKey(e.keyCode).foreach { _ =>
+      KeyMap.eventFor(e).foreach { _ =>
         e.stopPropagation()
         e.preventDefault()
       }

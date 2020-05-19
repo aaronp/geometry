@@ -108,4 +108,7 @@ case class Draw(canvas: Canvas) {
   def clear() = {
     context.clearRect(0, 0, width, height)
   }
+  def fill = {
+    context.fillRect(0, 0, width, height)
+  }
 }

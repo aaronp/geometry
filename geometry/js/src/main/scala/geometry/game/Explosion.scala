@@ -7,8 +7,8 @@ case class Explosion(center: Point, velocity: Velocity, time: Int = 1) extends G
     withColor("green") {
       context.beginPath()
 
-      val fromRads         = velocity.directionRads * 0.75
-      val toRads           = velocity.directionRads * 1.25
+      val fromRads         = velocity.directionRads + 0.75
+      val toRads           = velocity.directionRads - 0.75
       val shards           = 10
       val radDelta: Double = (toRads - fromRads) / shards
 
