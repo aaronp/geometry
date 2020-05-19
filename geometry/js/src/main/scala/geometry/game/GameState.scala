@@ -5,6 +5,7 @@ import geometry.{Draw, Rectangle}
 import scala.concurrent.duration._
 
 case class GameState(draw: Draw,
+                     assets: Assets,
                      p1: Ship = Ship.playerOne(),
                      components: List[GameComponent] = Nil,
                      collision: Boolean = false,
@@ -21,6 +22,7 @@ case class GameState(draw: Draw,
         val newComponents     = components.flatMap(_.update(this))
         val collisionVelocity = newComponents.view.flatMap(_.checkCollision(p1Updated.boundingCircle)).headOption
         val explosions: Seq[GameComponent] = collisionVelocity.fold(List[GameComponent]()) { v =>
+          assets.bang()
           Explosion(p1Updated.position, v) :: Nil
         }
         val updated = copy(p1 = p1Updated, components = explosions ++: newComponents, collision = collisionVelocity.isDefined)
@@ -61,6 +63,6 @@ case class GameState(draw: Draw,
 
   def render(d: Draw) = {
     components.foreach(_.render(d))
-    p1.render(d)
+    p1.render(d, assets)
   }
 }

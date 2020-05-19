@@ -3,7 +3,7 @@ package geometry
 import java.util.UUID
 
 import org.scalajs.dom
-import org.scalajs.dom.html.{Canvas, Div}
+import org.scalajs.dom.html.{Audio, Canvas, Div}
 import org.scalajs.dom.raw._
 import org.scalajs.dom.{CanvasRenderingContext2D, document, html, window}
 
@@ -28,6 +28,8 @@ trait HtmlUtils {
   def divById(id: String): Div = elmById(id) match {
     case div: Div => div
   }
+  def audioById(id: String) = elmById(id).asInstanceOf[Audio]
+
   def elmById(id: String) = document.getElementById(id)
   def canvas(canvasId: String) = {
     elmById(canvasId) match {

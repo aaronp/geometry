@@ -44,9 +44,16 @@
   cursor: pointer;
 }
 
+
     </style>
 </head>
 <body onload="Game.render('controls', 'target')">
+
+<!-- Assets -->
+<img id="ship1" style="display:none" src="img/ship1.png" />
+<audio id="sound-bang">
+    <source src="sounds/bang.m4a" type="audio/x-m4a">
+</audio>
 
 <div style="border: solid 1px red">
     <canvas id="target" style="display: block" id="canvas" width="500" height="1255"/>

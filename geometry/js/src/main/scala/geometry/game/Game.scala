@@ -15,7 +15,7 @@ object Game {
     val draw = Draw(containerId)
     draw.autoResize(0.8)
 
-    gameLoop(GameState(draw))
+    gameLoop(GameState(draw, Assets("sound-bang")))
   }
 
   def testExplosion(draw: Draw) = {
