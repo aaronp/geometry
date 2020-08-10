@@ -3,7 +3,7 @@ package geometry
 import geometry.Plot.Layout.{AsciiPoint, AsciiPolygon}
 
 case class Point(x: Double, y: Double) {
-  override def toString = s"($x,$y)"
+  override def toString = f"($x%1.3f,$y%1.3f)"
 
   def translate(deltaX: Double = 0, deltaY: Double = 0): Point = {
     copy(x + deltaX, y + deltaY)

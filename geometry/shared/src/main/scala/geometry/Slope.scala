@@ -4,6 +4,7 @@ sealed trait Slope {
   def isVertical: Boolean   = value.isInfinite
   def isHorizontal: Boolean = value == 0.0
   def value: Double
+
   def reciprocal: Slope
   def orthogonal: Slope
   def -(other: Slope): Slope = {
@@ -12,9 +13,11 @@ sealed trait Slope {
 }
 
 case class DoubleSlope(override val value: Double) extends Slope {
+  require(value != 0)
   override def reciprocal: Slope = DoubleSlope(1.0 / value)
   override def orthogonal: Slope = DoubleSlope(1.0 / -value)
   override def toString          = value.toString
+
 }
 
 case class Fraction(rise: Int, run: Int) extends Slope {
@@ -58,6 +61,7 @@ case class Fraction(rise: Int, run: Int) extends Slope {
       rise.toDouble / run.toDouble
     }
   }
+
 }
 
 object Slope {
@@ -80,7 +84,7 @@ object Slope {
         Fraction(numerator.toInt, scale.toInt)
       }
 
-      val s = possibilities.toStream.take(10)
+      val s = possibilities.to(LazyList).take(10)
       val opt = s.find { p =>
         val diff = from - p.value
         diff == 0.0

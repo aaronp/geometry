@@ -114,6 +114,30 @@ case class LineSegment(from: Point, to: Point) {
 
   def slopeInterceptFormula = s"y = ${slope}x + $b"
 
+  def slopeInDegrees: Double = radToDeg(slopeInRadians)
+
+  def slopeInRadians: Double = {
+    // vertical?
+    if (x2 == x1) {
+      if (y2 > y1) 90.0 else 1.5 * Math.PI
+      // horizontal?
+    } else if (y2 == y1) {
+      if (x2 > x1) 0.0 else Math.PI
+    } else {
+      // some degree...
+      if (x2 > x1) {
+        if (y2 > y1) {
+          Math.atan(slope.value)
+        } else {
+          (2 * Math.PI) + Math.atan(slope.value)
+        }
+      } else {
+        require(x2 < x1)
+        Math.PI + Math.atan(slope.value)
+      }
+    }
+  }
+
   def slope: Slope = {
     val rise = to.y - from.y
     val run  = to.x - from.x

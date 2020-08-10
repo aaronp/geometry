@@ -50,10 +50,15 @@ case class Draw(canvas: Canvas) {
     context.textAlign = before
     a
   }
-  def withColor[A](color: String)(thunk: => A) = {
-    val before = context.strokeStyle
+
+  def setColor(color: String) = {
     context.strokeStyle = color
     context.fillStyle = color
+  }
+
+  def withColor[A](color: String)(thunk: => A) = {
+    val before = context.strokeStyle
+    setColor(color)
     context.beginPath()
     val result = thunk
     context.strokeStyle = before
@@ -65,9 +70,9 @@ case class Draw(canvas: Canvas) {
     val metrics = context.measureText(text)
     maxWidth match {
       case Some(w) =>
-        context.fillText(s"$text, width: ${metrics.width}", at.x, at.y, w)
+        context.fillText(s"$text", at.x, at.y, w)
       case None =>
-        context.fillText(s"$text, width: ${metrics.width}", at.x, at.y)
+        context.fillText(s"$text", at.x, at.y)
     }
   }
 
