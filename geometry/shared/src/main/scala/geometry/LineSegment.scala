@@ -116,10 +116,29 @@ case class LineSegment(from: Point, to: Point) {
 
   def slopeInDegrees: Double = radToDeg(slopeInRadians)
 
+  def arrowTip(len: Double, spreadInDegrees: Double = 90.0): (LineSegment, LineSegment) = {
+    val halfSpread = spreadInDegrees / 2
+    val lineSlope  = slopeInDegrees
+    def mkArrowLeg(degrees: Double) = {
+      val rad     = degToRad(lineSlope + degrees)
+      val xOffset = Math.cos(rad) * len
+      val yOffset = Math.sin(rad) * len
+      LineSegment(Point(to.x + xOffset, to.y + yOffset), to)
+    }
+    val arrow1 = mkArrowLeg(180 + halfSpread)
+    val arrow2 = mkArrowLeg(180 - halfSpread)
+    (arrow1, arrow2)
+  }
+
+//  def arrowPoints(len: Double, spreadInDegrees: Double = 90.0) = {
+//    val (a,b) = arrowTip(len, spreadInDegrees)
+//    (a.from, b.from, to)
+//  }
+
   def slopeInRadians: Double = {
     // vertical?
     if (x2 == x1) {
-      if (y2 > y1) 90.0 else 1.5 * Math.PI
+      if (y2 > y1) Math.PI / 2 else 1.5 * Math.PI
       // horizontal?
     } else if (y2 == y1) {
       if (x2 > x1) 0.0 else Math.PI

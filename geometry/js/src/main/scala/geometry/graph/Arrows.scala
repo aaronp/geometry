@@ -34,6 +34,10 @@ object Arrows {
     lines(Point(300, 300), 240).foreach { line =>
       d.setColor("green")
       d.draw(line)
+
+      val (a, b) = line.arrowTip(30, spreadInDegrees = 60)
+      d.draw(a)
+      d.draw(b)
       dd.stroke()
       dd.closePath()
 
@@ -42,7 +46,6 @@ object Arrows {
       d.draw(f"${line.to} : ${line.slopeInDegrees}%1.2f or ${line.slope}", line.to)
       dd.closePath()
     }
-
   }
 
 }
